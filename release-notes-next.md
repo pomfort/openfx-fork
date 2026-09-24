@@ -15,6 +15,7 @@ This is version NEXT of the OpenFX API.
 - **Obsolete plugins**: Added `kOfxImageEffectPluginPropObsolete` so a plugin bundle can mark a plugin as obsolete: available for use in old projects but not offered to users for new use (issue #221).
 - **Windows ARM64 packaging**: Defined plugin install locations for Windows on ARM, including the new normative `Win-arm64ec` folder for Arm64EC/Arm64X plug-ins, with most-specific-first DLL search order (issue #160).
 - **Project-load semantics**: Hosts are now required to send the `instanceChanged` action with `kOfxPropChangeReason` = `kOfxChangePluginEdited` when a clip or parameter was changed while loading a project (issue #184).
+- **Metal texture rendering**: Added `kOfxImageEffectPropMetalTextureSupported` and `kOfxImageEffectPropMetalTextureEnabled` so a host can pass images to Metal plug-ins as `id<MTLTexture>` instead of `id<MTLBuffer>`, negotiated alongside the existing Metal buffer path. Proposed by Greg Cotten (Video Village); already implemented by Pomfort Livegrade (host) and Video Village Scatter (plug-in) (issue #NNN).
 
 ## Fixes in OpenFX Version NEXT:
 
@@ -32,6 +33,7 @@ This is version NEXT of the OpenFX API.
 
 ## Detailed List of Changes
 
+- Support library: added `ImageEffectDescriptor::setSupportsMetalTexture()`, `ImageEffectHostDescription::supportsMetalTexture`, `isEnabledMetalTexture` in the render argument structs and `ImageProcessor::processImagesMetalTexture()` for the Metal texture path; HostSupport registers the defaults for `kOfxImageEffectPropMetalTextureSupported` (issue #NNN).
 - Property metadata now lives in inline `@propdef` blocks in the headers (previously a separate YAML file); `scripts/gen-props.py` generates the reference documentation and the `openfx-cpp` metadata headers from it (#233).
 - Conan packaging: restructured the recipe to the standard Conan Center Index layout (headers under `include/`, libs and CMake module under `lib/`, licenses under `licenses/`) (issues #238, #246), and example-only dependencies (OpenGL, CImg, spdlog, OpenCL) are no longer imposed on consumers — they're gated behind a new `build_examples` option (#253).
 - Added `SECURITY.md` and fixed stale repository URLs (#242).

@@ -659,6 +659,16 @@ If not set:
 /**
  * @defgroup MetalRender Apple Metal Rendering
  * @version Metal rendering was added in version 1.5.
+ *
+ * Images can be passed to a Metal plug-in in one of two ways: as Metal
+ * buffers (id<MTLBuffer>), negotiated with
+ * ::kOfxImageEffectPropMetalRenderSupported, or as Metal textures
+ * (id<MTLTexture>), negotiated with
+ * ::kOfxImageEffectPropMetalTextureSupported. The two capabilities are
+ * independent; a host or plug-in may support either, both or neither.
+ * For each action the host chooses one of the paths both sides support
+ * and signals its choice with ::kOfxImageEffectPropMetalEnabled (buffers)
+ * or ::kOfxImageEffectPropMetalTextureEnabled (textures).
  * @{
  */
 /** @brief Indicates whether a host or plug-in can support Metal render
@@ -690,7 +700,8 @@ the current action
 
    - Valid Values
       - 0 indicates that the kOfxImagePropData of each image of each clip
-          is a CPU memory pointer.
+          is a CPU memory pointer, unless ::kOfxImageEffectPropMetalTextureEnabled
+          is 1, in which case it is a Metal id<MTLTexture>.
       - 1 indicates that the kOfxImagePropData of each image of each clip
 	      is a Metal id<MTLBuffer>.
 
@@ -719,6 +730,107 @@ complete before returning from the render action.
     introduced: "1.5"
 */
 #define kOfxImageEffectPropMetalCommandQueue "OfxImageEffectPropMetalCommandQueue"
+
+/** @brief Indicates whether a host or plug-in can support Metal texture render
+
+    - Valid Values -
+      - "false"  - the host or plug-in does not support Metal texture render
+      - "true"   - the host or plug-in can support Metal texture render
+      - "needed" - the plug-in can only render with Metal textures and has
+                   no other render path (plug-in descriptor only)
+
+This property adds a second way of passing images to a Metal plug-in: as
+Metal textures (id<MTLTexture>) instead of Metal buffers (id<MTLBuffer>).
+It is independent of ::kOfxImageEffectPropMetalRenderSupported, which
+covers Metal buffers only. A plug-in may declare buffers, textures, both or
+neither, and so may a host:
+
+  - buffers only: the host MAY set ::kOfxImageEffectPropMetalEnabled.
+  - textures only: the host MAY set ::kOfxImageEffectPropMetalTextureEnabled.
+  - both: the host chooses one of the two per action.
+  - neither: images are passed as CPU memory.
+
+For a given action the host MUST set at most one of the two enabled
+properties, and only for a path that both host and plug-in declared as
+supported. A host that does not know this property ignores it and keeps
+passing images as before, as CPU memory or Metal buffers, so declaring
+texture support does not change how a plug-in works with existing hosts.
+A plug-in that supports only textures appears to such a host as a plug-in
+without Metal support.
+
+The plug-in sets this property on its descriptor in ::kOfxActionDescribe; it
+defaults to "false". The host sets it on the host descriptor.
+
+An instance inherits the value set on the plug-in descriptor until the plug-in sets this property on the instance; a host must not substitute its own default at the instance level.
+
+    @propdef
+    type: enum
+    dimension: 1
+    values:
+      - "false"
+      - "true"
+      - needed
+ */
+#define kOfxImageEffectPropMetalTextureSupported "OfxImageEffectPropMetalTextureSupported"
+
+/** @brief Indicates that a plug-in SHOULD use Metal texture render in
+the current action
+
+   If a plug-in and host have both set
+   ::kOfxImageEffectPropMetalTextureSupported="true" (or the plug-in
+   "needed") then the host MAY set this property to indicate that it is
+   passing images as Metal textures. ::kOfxImageEffectPropMetalRenderSupported
+   does not need to be set for this.
+
+   This property is in the inArgs of the following actions:
+      - ::kOfxImageEffectActionRender
+      - ::kOfxImageEffectActionBeginSequenceRender
+      - ::kOfxImageEffectActionEndSequenceRender
+
+   - Valid Values
+      - 0 indicates that ::kOfxImagePropData of each image of each clip is
+          to be interpreted according to ::kOfxImageEffectPropMetalEnabled:
+          a Metal id<MTLBuffer> when that property is 1, otherwise a CPU
+          memory pointer.
+      - 1 indicates that ::kOfxImagePropData of each image of each clip
+          is a Metal id<MTLTexture>. ::kOfxImageEffectPropMetalEnabled MUST
+          be 0 in this case; a host MUST NOT set both properties to 1.
+
+   When this property is 1:
+
+   - ::kOfxImageEffectPropMetalCommandQueue holds the id<MTLCommandQueue>
+     the plug-in SHOULD encode its work onto, with the same rules as for
+     Metal buffers.
+   - The host owns the textures. The plug-in MUST NOT release them and
+     MUST NOT assume that the same textures are passed in the next
+     render. The host MUST keep them alive until the work the plug-in
+     enqueued on the command queue has completed.
+   - The textures follow the OpenFX coordinate convention: their origin is
+     the bottom left with y increasing upwards, consistent with
+     ::kOfxImagePropBounds, ::kOfxImagePropRegionOfDefinition, the regions
+     of interest and the render window. A plug-in works in OpenFX
+     coordinates throughout and does not need to flip.
+   - The MTLPixelFormat of a texture corresponds to
+     ::kOfxImageEffectPropPixelDepth and ::kOfxImageEffectPropComponents of
+     the image, as the memory layout does for CPU memory and Metal buffers:
+     for RGBA images ::kOfxBitDepthByte is MTLPixelFormatRGBA8Unorm,
+     ::kOfxBitDepthShort is MTLPixelFormatRGBA16Unorm, ::kOfxBitDepthHalf
+     is MTLPixelFormatRGBA16Float and ::kOfxBitDepthFloat is
+     MTLPixelFormatRGBA32Float; alpha-only images use the single-channel
+     R formats. Metal has no three-channel texture formats, so a host MUST
+     NOT pass ::kOfxImageComponentRGB images as textures. A host MUST NOT
+     pass a texture whose format does not match the depth and components
+     it reports. The plug-in MAY additionally read the format, dimensions
+     and usage from the MTLTexture.
+   - ::kOfxImagePropRowBytes has no meaning for a texture and is 0.
+   - Source textures MUST be readable from shaders; the output texture
+     MUST be writable from shaders.
+
+    @propdef
+    type: bool
+    dimension: 1
+*/
+#define kOfxImageEffectPropMetalTextureEnabled "OfxImageEffectPropMetalTextureEnabled"
 /** @}*/ // end MetalRender doc group
 
 /**
