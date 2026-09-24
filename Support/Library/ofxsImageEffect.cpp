@@ -718,6 +718,16 @@ namespace OFX {
     }
   }
 
+  /** @brief Does the plugin support Metal texture render */
+  void ImageEffectDescriptor::setSupportsMetalTexture(bool v)
+  {
+    try {
+      _effectProps.propSetString(kOfxImageEffectPropMetalTextureSupported, (v ? "true" : "false"));
+    } catch(OFX::Exception::PropertyUnknownToHost) {
+      OFX::Log::warning(true, "Host does not have kOfxImageEffectPropMetalTextureSupported property");
+    }
+  }
+
 #ifdef OFX_SUPPORTS_OPENGLRENDER
   /** @brief Does the plugin support OpenGL accelerated rendering (but is also capable of CPU rendering) ? */
   void ImageEffectDescriptor::setSupportsOpenGLRender(bool v) {
@@ -1875,6 +1885,7 @@ namespace OFX {
         gHostDescription.supportsCudaRender          = hostProps.propGetString(kOfxImageEffectPropCudaRenderSupported, 0, false) == "true";
         gHostDescription.supportsCudaStream          = hostProps.propGetString(kOfxImageEffectPropCudaStreamSupported, 0, false) == "true";
         gHostDescription.supportsMetalRender         = hostProps.propGetString(kOfxImageEffectPropMetalRenderSupported, 0, false) == "true";
+        gHostDescription.supportsMetalTexture        = hostProps.propGetString(kOfxImageEffectPropMetalTextureSupported, 0, false) == "true";
         gHostDescription.supportsRenderQualityDraft = hostProps.propGetInt(kOfxImageEffectPropRenderQualityDraft, false) != 0; // appeared in OFX 1.4
         {
             std::string originStr = hostProps.propGetString(kOfxImageEffectHostPropNativeOrigin, false); // appeared in OFX 1.4
@@ -2105,6 +2116,7 @@ namespace OFX {
       args.isEnabledOpenCLRender = inArgs.propGetInt(kOfxImageEffectPropOpenCLEnabled, false) != 0;
       args.isEnabledCudaRender   = inArgs.propGetInt(kOfxImageEffectPropCudaEnabled, false) != 0;
       args.isEnabledMetalRender  = inArgs.propGetInt(kOfxImageEffectPropMetalEnabled, false) != 0;
+      args.isEnabledMetalTexture = inArgs.propGetInt(kOfxImageEffectPropMetalTextureEnabled, false) != 0;
       args.pOpenCLCmdQ           = inArgs.propGetPointer(kOfxImageEffectPropOpenCLCommandQueue, false);
       args.pCudaStream           = inArgs.propGetPointer(kOfxImageEffectPropCudaStream, false);
       args.pMetalCmdQ            = inArgs.propGetPointer(kOfxImageEffectPropMetalCommandQueue, false);
@@ -2171,6 +2183,7 @@ namespace OFX {
       args.isEnabledOpenCLRender = inArgs.propGetInt(kOfxImageEffectPropOpenCLEnabled, false) != 0;
       args.isEnabledCudaRender   = inArgs.propGetInt(kOfxImageEffectPropCudaEnabled, false) != 0;
       args.isEnabledMetalRender  = inArgs.propGetInt(kOfxImageEffectPropMetalEnabled, false) != 0;
+      args.isEnabledMetalTexture = inArgs.propGetInt(kOfxImageEffectPropMetalTextureEnabled, false) != 0;
       args.pOpenCLCmdQ           = inArgs.propGetPointer(kOfxImageEffectPropOpenCLCommandQueue, false);
       args.pCudaStream           = inArgs.propGetPointer(kOfxImageEffectPropCudaStream, false);
       args.pMetalCmdQ            = inArgs.propGetPointer(kOfxImageEffectPropMetalCommandQueue, false);
@@ -2205,6 +2218,7 @@ namespace OFX {
       args.isEnabledOpenCLRender = inArgs.propGetInt(kOfxImageEffectPropOpenCLEnabled, false) != 0;
       args.isEnabledCudaRender   = inArgs.propGetInt(kOfxImageEffectPropCudaEnabled, false) != 0;
       args.isEnabledMetalRender  = inArgs.propGetInt(kOfxImageEffectPropMetalEnabled, false) != 0;
+      args.isEnabledMetalTexture = inArgs.propGetInt(kOfxImageEffectPropMetalTextureEnabled, false) != 0;
       args.pOpenCLCmdQ           = inArgs.propGetPointer(kOfxImageEffectPropOpenCLCommandQueue, false);
       args.pCudaStream           = inArgs.propGetPointer(kOfxImageEffectPropCudaStream, false);
       args.pMetalCmdQ            = inArgs.propGetPointer(kOfxImageEffectPropMetalCommandQueue, false);

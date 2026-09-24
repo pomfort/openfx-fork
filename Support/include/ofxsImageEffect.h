@@ -257,6 +257,7 @@ namespace OFX {
     bool supportsCudaRender;
     bool supportsCudaStream;
     bool supportsMetalRender;
+    bool supportsMetalTexture;
 #ifdef OFX_SUPPORTS_OPENGLRENDER
     bool supportsOpenGLRender;
 #endif
@@ -450,6 +451,10 @@ namespace OFX {
 
     /** @brief Does the plugin support Metal Render, defaults to false */
     void setSupportsMetalRender(bool v);
+
+    /** @brief Does the plugin support Metal texture render (images passed as id<MTLTexture>), defaults to false.
+        Independent of setSupportsMetalRender(), which covers Metal buffers; a plugin may support either, both or neither. */
+    void setSupportsMetalTexture(bool v);
 
 #ifdef OFX_SUPPORTS_OPENGLRENDER
     /** @brief Does the plugin support OpenGL accelerated rendering (but is also capable of CPU rendering) ? */
@@ -775,6 +780,7 @@ namespace OFX {
     bool      isEnabledOpenCLRender;
     bool      isEnabledCudaRender;
     bool      isEnabledMetalRender;
+    bool      isEnabledMetalTexture;
     void*     pOpenCLCmdQ;
     void*     pCudaStream;
     void*     pMetalCmdQ;
@@ -803,6 +809,7 @@ namespace OFX {
     bool      isEnabledOpenCLRender;
     bool      isEnabledCudaRender;
     bool      isEnabledMetalRender;
+    bool      isEnabledMetalTexture;
     void*     pOpenCLCmdQ;
     void*     pCudaStream;
     void*     pMetalCmdQ;
@@ -820,6 +827,7 @@ namespace OFX {
     bool      isEnabledOpenCLRender;
     bool      isEnabledCudaRender;
     bool      isEnabledMetalRender;
+    bool      isEnabledMetalTexture;
     void*     pOpenCLCmdQ;
     void*     pCudaStream;
     void*     pMetalCmdQ;

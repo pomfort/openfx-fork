@@ -33,6 +33,7 @@ namespace OFX {
         bool             _isEnabledOpenCLRender; /**< @brief is OpenCL Render Enabled */
         bool             _isEnabledCudaRender;   /**< @brief is Cuda Render Enabled */
         bool             _isEnabledMetalRender;   /**< @brief is Metal Render Enabled */
+        bool             _isEnabledMetalTexture;  /**< @brief is Metal Texture Render Enabled (images are id<MTLTexture>) */
         void*            _pOpenCLCmdQ;           /**< @brief OpenCL Command Queue Handle */
         void*            _pCudaStream;           /**< @brief Cuda Stream Handle */
         void*            _pMetalCmdQ;           /**< @brief Metal Command Queue Handle */
@@ -45,6 +46,7 @@ namespace OFX {
           , _isEnabledOpenCLRender(false)
           , _isEnabledCudaRender(false)
           , _isEnabledMetalRender(false)
+          , _isEnabledMetalTexture(false)
           , _pOpenCLCmdQ(NULL)
           , _pCudaStream(NULL)
           , _pMetalCmdQ(NULL)
@@ -61,6 +63,7 @@ namespace OFX {
             _isEnabledOpenCLRender = args.isEnabledOpenCLRender;
             _isEnabledCudaRender = args.isEnabledCudaRender;
             _isEnabledMetalRender = args.isEnabledMetalRender;
+            _isEnabledMetalTexture = args.isEnabledMetalTexture;
 
             if (_isEnabledOpenCLRender)
             {
@@ -70,7 +73,7 @@ namespace OFX {
             {
                 _pCudaStream = args.pCudaStream;
             }
-            if (_isEnabledMetalRender)
+            if (_isEnabledMetalRender || _isEnabledMetalTexture)
             {
                 _pMetalCmdQ = args.pMetalCmdQ;
             }
@@ -130,6 +133,14 @@ namespace OFX {
             OFX::throwSuiteStatusException(kOfxStatErrUnsupported);
         };
 
+        /** @brief this is called by process to actually process images using Metal textures when isEnabledMetalTexture is true
+            (the image data pointers are id<MTLTexture>), override in derived classes */
+        virtual void processImagesMetalTexture(void)
+        {
+            OFX::Log::print("processImagesMetalTexture not implemented");
+            OFX::throwSuiteStatusException(kOfxStatErrUnsupported);
+        };
+
         /** @brief this is called by multiThreadFunction to actually process images, override in derived classes */
         virtual void multiThreadProcessImages(OfxRectI window)
         {
@@ -170,6 +181,11 @@ namespace OFX {
             {
               OFX::Log::print("processing via CUDA");
                 processImagesCuda();
+            }
+            else if (_isEnabledMetalTexture)
+            {
+              OFX::Log::print("processing via Metal textures");
+                processImagesMetalTexture();
             }
             else if (_isEnabledMetalRender)
             {
