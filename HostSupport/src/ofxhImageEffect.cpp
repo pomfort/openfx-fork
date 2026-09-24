@@ -67,6 +67,7 @@ namespace OFX {
 	{ kOfxImageEffectPropCudaRenderSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropCudaStreamSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropMetalRenderSupported, Property::eString, 1, false, "false" },
+	{ kOfxImageEffectPropMetalTextureSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropOpenCLRenderSupported, Property::eString, 1, false, "false" },
 #endif
 
@@ -323,6 +324,7 @@ namespace OFX {
 	{ kOfxImageEffectPropCudaRenderSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropCudaStreamSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropMetalRenderSupported, Property::eString, 1, false, "false" },
+	{ kOfxImageEffectPropMetalTextureSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropOpenCLRenderSupported, Property::eString, 1, false, "false" },
 #endif
         Property::propSpecEnd
@@ -365,6 +367,7 @@ namespace OFX {
           kOfxImageEffectPropCudaRenderSupported,
           kOfxImageEffectPropCudaStreamSupported,
           kOfxImageEffectPropMetalRenderSupported,
+          kOfxImageEffectPropMetalTextureSupported,
           kOfxImageEffectPropOpenCLRenderSupported,
         };
         for (const char *name : inheritedStringProps)
@@ -2713,6 +2716,7 @@ namespace OFX {
 	{ kOfxImageEffectPropCudaRenderSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropCudaStreamSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropMetalRenderSupported, Property::eString, 1, false, "false" },
+	{ kOfxImageEffectPropMetalTextureSupported, Property::eString, 1, false, "false" },
 	{ kOfxImageEffectPropOpenCLRenderSupported, Property::eString, 1, false, "false" },
 #endif
         { kOfxImageEffectPropRenderQualityDraft, Property::eInt, 1, true, "0" }, // OFX 1.4
