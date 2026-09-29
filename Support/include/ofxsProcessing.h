@@ -32,7 +32,7 @@ namespace OFX {
         OfxRectI          _renderWindow;  /**< @brief render window to use */
         bool             _isEnabledOpenCLRender; /**< @brief is OpenCL Render Enabled */
         bool             _isEnabledCudaRender;   /**< @brief is Cuda Render Enabled */
-        bool             _isEnabledMetalRender;   /**< @brief is Metal Render Enabled */
+        bool             _isEnabledMetalRender;   /**< @brief is Metal buffer render enabled (image data are id<MTLBuffer>) */
         bool             _isEnabledMetalTexture;  /**< @brief is Metal Texture Render Enabled (images are id<MTLTexture>) */
         void*            _pOpenCLCmdQ;           /**< @brief OpenCL Command Queue Handle */
         void*            _pCudaStream;           /**< @brief Cuda Stream Handle */
@@ -126,7 +126,8 @@ namespace OFX {
             OFX::throwSuiteStatusException(kOfxStatErrUnsupported);
         };
 
-        /** @brief this is called by process to actually process images using Metal when isEnabledMetalRender is true, override in derived classes */
+        /** @brief this is called by process to actually process images using Metal buffers when isEnabledMetalRender is true
+            (the image data pointers are id<MTLBuffer>), override in derived classes */
         virtual void processImagesMetal(void)
         {
             OFX::Log::print("processImagesMetal not implemented");
@@ -189,7 +190,7 @@ namespace OFX {
             }
             else if (_isEnabledMetalRender)
             {
-              OFX::Log::print("processing via Metal");
+              OFX::Log::print("processing via Metal buffers");
                 processImagesMetal();
             }
             else // is CPU

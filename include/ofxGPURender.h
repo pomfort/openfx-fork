@@ -658,7 +658,7 @@ If not set:
 
 /**
  * @defgroup MetalRender Apple Metal Rendering
- * @version Metal rendering was added in version 1.5.
+ * @version Metal buffer rendering was added in version 1.5.
  *
  * Images can be passed to a Metal plug-in in one of two ways: as Metal
  * buffers (id<MTLBuffer>), negotiated with
@@ -671,11 +671,18 @@ If not set:
  * or ::kOfxImageEffectPropMetalTextureEnabled (textures).
  * @{
  */
-/** @brief Indicates whether a host or plug-in can support Metal render
+/** @brief Indicates whether a host or plug-in can support Metal buffer render
+(images passed as id<MTLBuffer>)
 
     - Valid Values -
-      - "false"  - the host or plug-in does not support Metal render
-      - "true"   - the host or plug-in can support Metal render
+      - "false"  - the host or plug-in does not support Metal buffer render
+      - "true"   - the host or plug-in can support Metal buffer render
+      - "needed" - the plug-in can only render with Metal buffers and has
+                   no other render path (plug-in descriptor only)
+
+Texture handover is declared separately with
+::kOfxImageEffectPropMetalTextureSupported; this property covers Metal
+buffers only.
 
 An instance inherits the value set on the plug-in descriptor until the plug-in sets this property on the instance; a host must not substitute its own default at the instance level.
 
@@ -690,13 +697,13 @@ An instance inherits the value set on the plug-in descriptor until the plug-in s
  */
 #define kOfxImageEffectPropMetalRenderSupported "OfxImageEffectPropMetalRenderSupported"
 
-/** @brief Indicates that a plug-in SHOULD use Metal render in
+/** @brief Indicates that a plug-in SHOULD use Metal buffer render in
 the current action
 
    If a plug-in and host have both set
    kOfxImageEffectPropMetalRenderSupported="true" then the host MAY
    set this property to indicate that it is passing images as Metal
-   buffers.
+   buffers (id<MTLBuffer>).
 
    - Valid Values
       - 0 indicates that the kOfxImagePropData of each image of each clip
@@ -717,6 +724,10 @@ the current action
 This property contains a pointer to the command queue to be used for
 Metal rendering (id<MTLCommandQueue>). In order to use it,
 reinterpret_cast<id<MTLCommandQueue>>(pointer) is needed.
+
+The same queue serves both Metal buffer render and Metal texture render,
+whichever of ::kOfxImageEffectPropMetalEnabled or
+::kOfxImageEffectPropMetalTextureEnabled the host set for the action.
 
 The plug-in SHOULD ensure that its render action enqueues any
 asynchronous Metal operations onto the supplied queue.

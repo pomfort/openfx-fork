@@ -449,7 +449,7 @@ namespace OFX {
     /** @brief Does the plugin support CUDA Stream Render, defaults to false */
     void setSupportsCudaStream(bool v);
 
-    /** @brief Does the plugin support Metal Render, defaults to false */
+    /** @brief Does the plugin support Metal buffer render (images passed as id<MTLBuffer>), defaults to false */
     void setSupportsMetalRender(bool v);
 
     /** @brief Does the plugin support Metal texture render (images passed as id<MTLTexture>), defaults to false.

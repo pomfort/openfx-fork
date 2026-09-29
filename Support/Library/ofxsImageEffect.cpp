@@ -708,7 +708,7 @@ namespace OFX {
     }
   }
 
-  /** @brief Does the plugin support Metal Render */
+  /** @brief Does the plugin support Metal buffer render */
   void ImageEffectDescriptor::setSupportsMetalRender(bool v)
   {
     try {
