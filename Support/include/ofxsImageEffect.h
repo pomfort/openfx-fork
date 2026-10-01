@@ -431,6 +431,10 @@ namespace OFX {
     /** @brief Does the plugin support inputs and output clips of pixel aspect ratios, defaults to false */
     void setSupportsMultipleClipPARs(bool v);
 
+    /** @brief Can the plugin render without spatial awareness (kOfxImageEffectPropNoSpatialAwareness, OFX 1.5.1), defaults to false.
+        If set, the plugin must disable its spatial effects for renders where RenderArguments::hasNoSpatialAwareness is true. */
+    void setSupportsNoSpatialAwareness(bool v);
+
     /** @brief How thread safe is the plugin, defaults to eRenderInstanceSafe */
     void setRenderThreadSafety(RenderSafetyEnum v);
 
@@ -790,6 +794,7 @@ namespace OFX {
     bool      sequentialRenderStatus;
     bool      interactiveRenderStatus;
     bool      renderQualityDraft;
+    bool      hasNoSpatialAwareness;
   };
 
   /** @brief POD struct to pass rendering arguments into @ref OFX::ImageEffect::isIdentity */
@@ -818,6 +823,7 @@ namespace OFX {
 #endif
     bool      sequentialRenderStatus;
     bool      interactiveRenderStatus;
+    bool      hasNoSpatialAwareness;
   };
 
   /** @brief POD struct to pass arguments into  @ref OFX::ImageEffect::beginSequenceRender */

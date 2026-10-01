@@ -728,6 +728,16 @@ namespace OFX {
     }
   }
 
+  /** @brief Can the plugin render without spatial awareness */
+  void ImageEffectDescriptor::setSupportsNoSpatialAwareness(bool v)
+  {
+    try {
+      _effectProps.propSetString(kOfxImageEffectPropNoSpatialAwareness, (v ? "true" : "false"));
+    } catch(OFX::Exception::PropertyUnknownToHost) {
+      OFX::Log::warning(true, "Host does not have kOfxImageEffectPropNoSpatialAwareness property");
+    }
+  }
+
 #ifdef OFX_SUPPORTS_OPENGLRENDER
   /** @brief Does the plugin support OpenGL accelerated rendering (but is also capable of CPU rendering) ? */
   void ImageEffectDescriptor::setSupportsOpenGLRender(bool v) {
@@ -2135,6 +2145,9 @@ namespace OFX {
       // kOfxImageEffectPropRenderQualityDraft appeared in OFX 1.4
       args.renderQualityDraft = inArgs.propGetInt(kOfxImageEffectPropRenderQualityDraft, false) != 0;
 
+      // kOfxImageEffectPropNoSpatialAwareness appeared in OFX 1.5.1
+      args.hasNoSpatialAwareness = inArgs.propGetString(kOfxImageEffectPropNoSpatialAwareness, 0, false) == "true";
+
       args.fieldToRender = eFieldNone;
       std::string str = inArgs.propGetString(kOfxImageEffectPropFieldToRender);
       try {
@@ -2198,6 +2211,9 @@ namespace OFX {
       // They appeared in OFX 1.2
       args.sequentialRenderStatus = inArgs.propGetInt(kOfxImageEffectPropSequentialRenderStatus, false) != 0;
       args.interactiveRenderStatus = inArgs.propGetInt(kOfxImageEffectPropInteractiveRenderStatus, false) != 0;
+
+      // kOfxImageEffectPropNoSpatialAwareness appeared in OFX 1.5.1
+      args.hasNoSpatialAwareness = inArgs.propGetString(kOfxImageEffectPropNoSpatialAwareness, 0, false) == "true";
         
       // and call the plugin client render code
       effectInstance->beginSequenceRender(args);

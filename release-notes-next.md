@@ -34,6 +34,7 @@ This is version NEXT of the OpenFX API.
 ## Detailed List of Changes
 
 - Support library: added `ImageEffectDescriptor::setSupportsMetalTexture()`, `ImageEffectHostDescription::supportsMetalTexture`, `isEnabledMetalTexture` in the render argument structs and `ImageProcessor::processImagesMetalTexture()` for the Metal texture path; HostSupport registers the defaults for `kOfxImageEffectPropMetalTextureSupported` (issue #NNN).
+- Support library: added `ImageEffectDescriptor::setSupportsNoSpatialAwareness()`, `hasNoSpatialAwareness` in the render and begin-sequence-render argument structs, and `ImageProcessor::hasNoSpatialAwareness()`, so plug-ins built on the support library can use `kOfxImageEffectPropNoSpatialAwareness` (in the standard since 1.5.1).
 - Property metadata now lives in inline `@propdef` blocks in the headers (previously a separate YAML file); `scripts/gen-props.py` generates the reference documentation and the `openfx-cpp` metadata headers from it (#233).
 - Conan packaging: restructured the recipe to the standard Conan Center Index layout (headers under `include/`, libs and CMake module under `lib/`, licenses under `licenses/`) (issues #238, #246), and example-only dependencies (OpenGL, CImg, spdlog, OpenCL) are no longer imposed on consumers — they're gated behind a new `build_examples` option (#253).
 - Added `SECURITY.md` and fixed stale repository URLs (#242).

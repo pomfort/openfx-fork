@@ -34,6 +34,7 @@ namespace OFX {
         bool             _isEnabledCudaRender;   /**< @brief is Cuda Render Enabled */
         bool             _isEnabledMetalRender;   /**< @brief is Metal buffer render enabled (image data are id<MTLBuffer>) */
         bool             _isEnabledMetalTexture;  /**< @brief is Metal Texture Render Enabled (images are id<MTLTexture>) */
+        bool             _hasNoSpatialAwareness;  /**< @brief render without spatial awareness was requested (kOfxImageEffectPropNoSpatialAwareness) */
         void*            _pOpenCLCmdQ;           /**< @brief OpenCL Command Queue Handle */
         void*            _pCudaStream;           /**< @brief Cuda Stream Handle */
         void*            _pMetalCmdQ;           /**< @brief Metal Command Queue Handle */
@@ -47,6 +48,7 @@ namespace OFX {
           , _isEnabledCudaRender(false)
           , _isEnabledMetalRender(false)
           , _isEnabledMetalTexture(false)
+          , _hasNoSpatialAwareness(false)
           , _pOpenCLCmdQ(NULL)
           , _pCudaStream(NULL)
           , _pMetalCmdQ(NULL)
@@ -57,6 +59,9 @@ namespace OFX {
         /** @brief set the destination image */
         void setDstImg(OFX::Image *v) {_dstImg = v; }
 
+        /** @brief was the render requested without spatial awareness, valid after setGPURenderArgs(); processImages*() overrides must then disable spatial effects */
+        bool hasNoSpatialAwareness(void) const { return _hasNoSpatialAwareness; }
+
         /** @brief set OpenCL, CUDA render arguments */
         void setGPURenderArgs(const OFX::RenderArguments& args)
         {
@@ -64,6 +69,7 @@ namespace OFX {
             _isEnabledCudaRender = args.isEnabledCudaRender;
             _isEnabledMetalRender = args.isEnabledMetalRender;
             _isEnabledMetalTexture = args.isEnabledMetalTexture;
+            _hasNoSpatialAwareness = args.hasNoSpatialAwareness;
 
             if (_isEnabledOpenCLRender)
             {
